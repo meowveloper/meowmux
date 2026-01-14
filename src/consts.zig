@@ -1,1 +1,1 @@
-pub const file_path = "test.json";
+pub const file_path = "~/.config/meowmux/projects.json";

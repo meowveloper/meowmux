@@ -8,8 +8,11 @@ pub fn get_projects (allocator: std.mem.Allocator) !std.json.Parsed([]types.Proj
     var string: std.io.Writer.Allocating = .init(allocator);
     defer string.deinit();
 
-    const file = std.fs.cwd().openFile(constants.file_path, .{ .mode = .read_only }) catch {
-        try utils.print("cannot open the file at {s}\n", .{constants.file_path});
+    const expanded = try utils.ExpandedPath.get_path(allocator, constants.file_path);
+    defer expanded.deinit();
+
+    const file = std.fs.cwd().openFile(expanded.path, .{ .mode = .read_only }) catch {
+        try utils.print("cannot open the file at {s}\n", .{expanded.path});
         return error.FileNotFound;
     };
     defer file.close();
