@@ -1,16 +1,16 @@
 const std = @import("std");
 const utils = @import("utils.zig");
 const constants = @import("consts.zig");
+const types = @import("types.zig");
 
-const Project = struct { name: []u8, path: []u8 };
 
-pub fn get_projects (allocator: std.mem.Allocator) !void {
+pub fn get_projects (allocator: std.mem.Allocator) !std.json.Parsed([]types.Project) {
     var string: std.io.Writer.Allocating = .init(allocator);
     defer string.deinit();
 
     const file = std.fs.cwd().openFile(constants.file_path, .{ .mode = .read_only }) catch {
         try utils.print("cannot open the file at {s}\n", .{constants.file_path});
-        return;
+        return error.FileNotFound;
     };
     defer file.close();
 
@@ -25,18 +25,13 @@ pub fn get_projects (allocator: std.mem.Allocator) !void {
     const result = string.written();
 
     const parsed = std.json.parseFromSlice(
-        []Project,
+        []types.Project,
         allocator,
         result,
         .{},
     ) catch {
         try utils.print("invalid json structure\n", .{});
-        return;
+        return error.InvalidJSON;
     };
-    defer parsed.deinit();
-    const projects: []Project = parsed.value;
-
-    for(projects, 0..projects.len) |project, i| {
-        try utils.print("{d}. name: {s}, path: {s}\n", .{i + 1, project.name, project.path});
-    }
+    return parsed;
 }
