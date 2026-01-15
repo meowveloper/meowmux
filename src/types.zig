@@ -1,1 +1,1 @@
-pub const Project = struct { name: []u8, path: []u8 };
+pub const Project = struct { name: []const u8, path: []const u8 };

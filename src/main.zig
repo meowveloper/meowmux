@@ -1,15 +1,16 @@
 const std = @import("std");
 const utils = @import("utils.zig");
-const read = @import("read.zig");
 const tmux = @import("tmux.zig");
 const tui = @import("tui.zig");
+const config = @import("config.zig");
+const constants = @import("consts.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
-    const parsed_projects = try read.get_projects(allocator);
+    const parsed_projects = try config.get_projects(allocator, constants.config_file_path);
     defer parsed_projects.deinit();
     const projects = parsed_projects.value;
 
