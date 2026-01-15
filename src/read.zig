@@ -8,7 +8,7 @@ pub fn get_projects (allocator: std.mem.Allocator) !std.json.Parsed([]types.Proj
     var string: std.io.Writer.Allocating = .init(allocator);
     defer string.deinit();
 
-    const expanded = try utils.ExpandedPath.get_path(allocator, constants.file_path);
+    const expanded = try utils.ExpandedPath.get_path(allocator, constants.config_file_path);
     defer expanded.deinit();
 
     const file = std.fs.cwd().openFile(expanded.path, .{ .mode = .read_only }) catch {

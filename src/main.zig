@@ -14,5 +14,7 @@ pub fn main() !void {
     defer parsed_projects.deinit();
     const projects = parsed_projects.value;
 
-    try tmux.init_tmux_session(allocator, projects);
+    while(true) {
+        try tmux.init_tmux_session(allocator, projects);
+    }
 }

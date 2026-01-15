@@ -3,6 +3,7 @@ const types = @import("types.zig");
 const utils = @import("utils.zig");
 
 pub fn init_tmux_session (allocator: std.mem.Allocator, projects: []types.Project) !void {
+    try utils.print("\n\n============\n", .{});
     for(projects, 0..projects.len) |project, i| {
         try utils.print("{d}. name: {s}, path: {s}\n", .{i + 1, project.name, project.path});
     }
