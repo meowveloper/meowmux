@@ -1,6 +1,8 @@
 const std = @import("std");
 const types = @import("types.zig");
 const utils = @import("utils.zig");
+const config = @import("config.zig");
+const constants = @import("consts.zig");
 
 pub const Key = union(enum) {
     char: u8,
@@ -99,3 +101,4 @@ pub const Tui = struct {
         }
     }
 };
+

@@ -1,7 +1,7 @@
 const std = @import("std");
 const utils = @import("utils.zig");
-const constants = @import("consts.zig");
 const types = @import("types.zig");
+const constants = @import("consts.zig");
 
 pub fn ensure_config_exists(allocator: std.mem.Allocator, config_path: []const u8) !void {
     const expanded_path = try utils.ExpandedPath.get_path(allocator, config_path);
@@ -32,7 +32,7 @@ pub fn get_projects(allocator: std.mem.Allocator, config_file_path: []const u8) 
     });
 }
 
-pub fn save_projects(allocator: std.mem.Allocator, projects: []const types.Project, config_path: []const u8) !void {
+pub fn save_projects(allocator: std.mem.Allocator, projects: []types.Project, config_path: []const u8) !void {
     const expanded_path = try utils.ExpandedPath.get_path(allocator, config_path);
     defer expanded_path.deinit();
 
@@ -47,30 +47,23 @@ pub fn save_projects(allocator: std.mem.Allocator, projects: []const types.Proje
     try writer.flush();
 }
 
-const test_json_file_path = "test.json";
-
 test "save_projects" {
     const allocator = std.testing.allocator;
-    const project_a = types.Project{
-        .name = "test a",
-        .path = "/test-path-a"
-    };
-    const project_b = types.Project{
-        .name = "test b",
-        .path = "/test-path-b"
-    };
-    const projs : [2]types.Project = .{project_a, project_b};
-
-    try save_projects(allocator, &projs, test_json_file_path);
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const pro_slice: []types.Project = pro_arr.items;
+    try save_projects(allocator, pro_slice, constants.test_json_file_path);
 }
 
 test "get_projects" {
     const allocator = std.testing.allocator;
-    const parsed_projects = try get_projects(allocator, test_json_file_path);
+    const parsed_projects = try get_projects(allocator, constants.test_json_file_path);
     defer parsed_projects.deinit();
     const projects = parsed_projects.value;
-    for(projects, 0..) |project, i| {
-        std.debug.print("{d}. {s} ({s})\n", .{ i + 1, project.name, project.path});
+    for(projects) |project| {
+        std.debug.print("{s} ({s})\n", .{project.name, project.path});
     }
 }
 
