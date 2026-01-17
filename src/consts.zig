@@ -14,7 +14,8 @@ pub const app_state_str =
     "\r\n\r\n" ++
     indent ++ "choose action (type one: o, Enter, a, d, e)" ++
     "\r\n\r\n" ++
-    indent ++ "open(o, Enter),   add project(a),   delete project(d),   edit project(e)"
+    indent ++ "open(o, Enter),   add project(a),   delete project(d),   edit project(e)" ++
+    "\r\n\r\n"
 ;
 
 test "test print" {

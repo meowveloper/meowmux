@@ -4,7 +4,7 @@ const tui = @import("tui.zig");
 const types = @import("types.zig");
 const constants = @import("consts.zig");
 
-test "save_projects" {
+test "config.save_projects" {
     const allocator = std.testing.allocator;
     var pro_arr : std.ArrayList(types.Project) = .empty;
     defer pro_arr.deinit(allocator);
@@ -14,7 +14,7 @@ test "save_projects" {
     try config.save_projects(allocator, pro_slice, constants.test_json_file_path);
 }
 
-test "get_projects" {
+test "config.get_projects" {
     const allocator = std.testing.allocator;
     const parsed_projects = try config.get_projects(allocator, constants.test_json_file_path);
     defer parsed_projects.deinit();
@@ -24,7 +24,7 @@ test "get_projects" {
     }
 }
 
-test "parse_sequence keys" {
+test "tui.parse_sequence" {
     const testing = std.testing;
 
     // Arrows
@@ -44,11 +44,24 @@ test "parse_sequence keys" {
 
 
 
-test "delete_project" {
+test "config.delete_project" {
     const allocator = std.testing.allocator;
     var pro_arr : std.ArrayList(types.Project) = .empty;
     defer pro_arr.deinit(allocator);
     try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
     try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
-    try config.delete_project(allocator, pro_arr.items, 0, "test.json");
+    try config.delete_project(allocator, pro_arr.items, 0, constants.test_json_file_path);
+}
+
+test "config.add_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const new_project: types.Project = .{
+        .name = "added",
+        .path = "/mmm/added"
+    };
+    try config.add_project(allocator, pro_arr.items, new_project, constants.test_json_file_path);
 }

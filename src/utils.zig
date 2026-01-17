@@ -8,6 +8,15 @@ pub fn print(comptime fmt: []const u8, args: anytype) !void {
     try stdout.flush(); 
 }
 
+pub fn get_user_input (buffer: []u8) ![]const u8 {
+    var stdin_reader = std.fs.File.stdin().reader(buffer);
+    const stdin = &stdin_reader.interface;
+    const line_raw = try stdin.takeDelimiter('\n');
+    const line = std.mem.trim(u8, line_raw.?, &std.ascii.whitespace);
+    return line;
+}
+
+
 pub const ExpandedPath = struct {
     path: []u8,
     allocator: std.mem.Allocator,
