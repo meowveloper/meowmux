@@ -41,3 +41,14 @@ test "parse_sequence keys" {
     const q_key = tui.parse_sequence("q");
     try testing.expectEqual(tui.Key{ .char = 'q' }, q_key);
 }
+
+
+
+test "delete_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    try config.delete_project(allocator, pro_arr.items, 0, "test.json");
+}

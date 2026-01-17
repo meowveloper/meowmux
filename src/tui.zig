@@ -19,6 +19,10 @@ pub const Tui = struct {
     original_termios: std.posix.termios,
     stdin: std.fs.File,
 
+    fn clear_screen(_: *Tui) !void {
+        try utils.print("\x1b[2J\x1b[H", .{});
+    }
+
     pub fn init(allocator: std.mem.Allocator) !Tui {
         const stdin = std.fs.File.stdin();
         const original = try std.posix.tcgetattr(stdin.handle);
@@ -60,20 +64,16 @@ pub const Tui = struct {
         std.posix.tcsetattr(self.stdin.handle, .FLUSH, self.original_termios) catch {};
     }
 
-
     pub fn read_key(self: *Tui) !Key {
         var buf: [8]u8 = undefined;
         const n = try self.stdin.read(&buf);
         return parse_sequence(buf[0..n]);
     }
 
-    fn clear_screen(_: *Tui) !void {
-        try utils.print("\x1b[2J\x1b[H", .{});
-    }
 
-    pub fn render(self: *Tui, projects: []types.Project, selected_index: usize) !void {
+    pub fn render_list(self: *Tui, projects: []types.Project, selected_index: usize) !void {
         try self.clear_screen();
-        try utils.print("MEOWMUX - Select a Project (j/k or arrows, Enter to select, q to quit)\r\n\r\n", .{});
+        try utils.print("{s}", .{constants.app_title_str});
 
         for (projects, 0..) |project, i| {
             if (i == selected_index) {
@@ -82,6 +82,10 @@ pub const Tui = struct {
                 try utils.print("  {s} ({s})\r\n", .{ project.name, project.path });
             }
         }
+    }
+    pub fn render_app_states (self: *Tui) !void {
+        try self.clear_screen();
+        try utils.print("{s}\n", .{constants.app_state_str});
     }
 };
 

@@ -47,4 +47,14 @@ pub fn save_projects(allocator: std.mem.Allocator, projects: []types.Project, co
     try writer.flush();
 }
 
+pub fn delete_project(allocator: std.mem.Allocator, projects: []types.Project, index: usize, config_path: []const u8) !void {
+    const proj_arr : std.ArrayList(types.Project) = .empty;
+    defer proj_arr.deinit(allocator);
+    for (projects, 0..projects.len) |pro, i| {
+        if(i != index) try proj_arr.append(allocator, pro);
+    }
+    try save_projects(allocator, proj_arr.items, config_path);
+}
+
+
 
