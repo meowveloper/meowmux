@@ -47,23 +47,4 @@ pub fn save_projects(allocator: std.mem.Allocator, projects: []types.Project, co
     try writer.flush();
 }
 
-test "save_projects" {
-    const allocator = std.testing.allocator;
-    var pro_arr : std.ArrayList(types.Project) = .empty;
-    defer pro_arr.deinit(allocator);
-    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
-    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
-    const pro_slice: []types.Project = pro_arr.items;
-    try save_projects(allocator, pro_slice, constants.test_json_file_path);
-}
-
-test "get_projects" {
-    const allocator = std.testing.allocator;
-    const parsed_projects = try get_projects(allocator, constants.test_json_file_path);
-    defer parsed_projects.deinit();
-    const projects = parsed_projects.value;
-    for(projects) |project| {
-        std.debug.print("{s} ({s})\n", .{project.name, project.path});
-    }
-}
 

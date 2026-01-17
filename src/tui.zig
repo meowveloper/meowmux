@@ -85,7 +85,7 @@ pub const Tui = struct {
     }
 };
 
-fn parse_sequence (buf: []const u8) Key {
+pub fn parse_sequence (buf: []const u8) Key {
     if(buf.len == 0) return .unknown; 
     if(buf[0] == 27) {
         if (buf.len == 1) return .esc;
@@ -106,20 +106,3 @@ fn parse_sequence (buf: []const u8) Key {
     }
 }
 
-test "parse_sequence keys" {
-    const testing = std.testing;
-
-    // Arrows
-    try testing.expectEqual(Key.up, parse_sequence("\x1b[A"));
-    try testing.expectEqual(Key.down, parse_sequence("\x1b[B"));
-
-    // Special
-    try testing.expectEqual(Key.esc, parse_sequence("\x1b"));
-    try testing.expectEqual(Key.enter, parse_sequence("\r"));
-    try testing.expectEqual(Key.enter, parse_sequence("\n"));
-    try testing.expectEqual(Key.ctrl_c, parse_sequence(&[_]u8{3}));
-
-    // Chars
-    const q_key = parse_sequence("q");
-    try testing.expectEqual(Key{ .char = 'q' }, q_key);
-}
