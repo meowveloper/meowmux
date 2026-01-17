@@ -60,28 +60,11 @@ pub const Tui = struct {
         std.posix.tcsetattr(self.stdin.handle, .FLUSH, self.original_termios) catch {};
     }
 
+
     pub fn read_key(self: *Tui) !Key {
         var buf: [8]u8 = undefined;
         const n = try self.stdin.read(&buf);
-        if (n == 0) return .unknown;
-
-        if (buf[0] == 27) { // ESC
-            if (n == 1) return .esc;
-            if (n >= 3 and buf[1] == '[') {
-                switch (buf[2]) {
-                    'A' => return .up,
-                    'B' => return .down,
-                    else => {},
-                }
-            }
-            return .esc;
-        }
-
-        if (buf[0] == '\r' or buf[0] == '\n') return .enter;
-        if (buf[0] == 3) return .ctrl_c; // Ctrl+C
-        if (buf[0] >= 32 and buf[0] <= 126) return .{ .char = buf[0] };
-
-        return .unknown;
+        return parse_sequence(buf[0..n]);
     }
 
     fn clear_screen(_: *Tui) !void {
@@ -102,3 +85,41 @@ pub const Tui = struct {
     }
 };
 
+fn parse_sequence (buf: []const u8) Key {
+    if(buf.len == 0) return .unknown; 
+    if(buf[0] == 27) {
+        if (buf.len == 1) return .esc;
+        if (buf.len >= 3 and buf[1] == '[') {
+            switch (buf[2]) {
+                'A' => return .up,
+                'B' => return .down,
+                else => {},
+            }
+        }
+        return .esc;
+    }
+    switch (buf[0]) {
+        '\r', '\n' => return .enter,
+        3 => return .ctrl_c,
+        32...126 => return .{ .char = buf[0] },
+        else => return .unknown,
+    }
+}
+
+test "parse_sequence keys" {
+    const testing = std.testing;
+
+    // Arrows
+    try testing.expectEqual(Key.up, parse_sequence("\x1b[A"));
+    try testing.expectEqual(Key.down, parse_sequence("\x1b[B"));
+
+    // Special
+    try testing.expectEqual(Key.esc, parse_sequence("\x1b"));
+    try testing.expectEqual(Key.enter, parse_sequence("\r"));
+    try testing.expectEqual(Key.enter, parse_sequence("\n"));
+    try testing.expectEqual(Key.ctrl_c, parse_sequence(&[_]u8{3}));
+
+    // Chars
+    const q_key = parse_sequence("q");
+    try testing.expectEqual(Key{ .char = 'q' }, q_key);
+}
