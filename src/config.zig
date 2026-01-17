@@ -63,5 +63,13 @@ pub fn add_project(allocator: std.mem.Allocator, projects: []types.Project, new_
     try save_projects(allocator, proj_arr.items, config_path);
 }
 
+pub fn edit_project(allocator: std.mem.Allocator, projects: []types.Project, new_project: types.Project, index: usize, config_path: []const u8) !void {
+    var proj_arr : std.ArrayList(types.Project) = .empty;
+    defer proj_arr.deinit(allocator);
+    try proj_arr.appendSlice(allocator, projects);
+    _ = proj_arr.orderedRemove(index);
+    try proj_arr.insert(allocator, index, new_project);
+    try save_projects(allocator, proj_arr.items, config_path);
+}
 
 

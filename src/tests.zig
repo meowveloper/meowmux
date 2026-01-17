@@ -65,3 +65,16 @@ test "config.add_project" {
     };
     try config.add_project(allocator, pro_arr.items, new_project, constants.test_json_file_path);
 }
+
+test "config.edit_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const edited_project: types.Project = .{
+        .name = "edited",
+        .path = "/mmm/edited"
+    };
+    try config.edit_project(allocator, pro_arr.items, edited_project, 0, constants.test_json_file_path);
+}
