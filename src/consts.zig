@@ -10,16 +10,13 @@ pub const indent = "    ";
 
 // for raw mode, we cannot use multilinne strings.
 pub const app_state_str = 
-    indent ++ "MEOWMUX - Select a Project (j/k or arrows, Enter to select, q to quit)" ++
+    indent ++ "MEOWMUX - tmux project manager" ++
     "\r\n\r\n" ++
     indent ++ "choose action (type one: o, Enter, a, d, e)" ++
     "\r\n\r\n" ++
-    indent ++ "open(o, Enter),   add project(a),   delete project(d),   edit project(e)" ++
+    indent ++ "open project(o, Enter),   add project(a),   delete project(d),   edit project(e)" ++
     "\r\n\r\n"
 ;
 
-test "test print" {
-    std.debug.print("{s}", .{app_state_str});
-}
 
 
