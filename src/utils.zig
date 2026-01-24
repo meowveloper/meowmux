@@ -55,9 +55,7 @@ pub fn get_suggested_path(allocator: std.mem.Allocator, input: []const u8) ![]co
                 } else continue;
             }
             if (std.mem.startsWith(u8, entry.name, prefix)) {
-                if (entry.name.len > prefix.len) {
-                    result = entry.name[0 .. prefix.len + 1];
-                } else result = entry.name;
+                result = entry.name[prefix.len..];
                 break;
             }
             result = "";
@@ -68,6 +66,6 @@ pub fn get_suggested_path(allocator: std.mem.Allocator, input: []const u8) ![]co
 
 test "get_suggested_path" {
     const allocator = std.testing.allocator;
-    const result = try get_suggested_path(allocator, "/home/meowveloper/.config");
+    const result = try get_suggested_path(allocator, "/");
     std.debug.print("res: {s}\n\n", .{result});
 }
