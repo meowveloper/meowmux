@@ -91,7 +91,7 @@ pub fn open_input(allocator: std.mem.Allocator, value: *std.ArrayList(u8), promp
         switch (key) {
             .char => |c| try value.append(allocator, c),
             .backspace => _ = value.pop(),
-            .ctrl_c => break,
+            .ctrl_c => return error.quit,
             .enter => break,
             else => {}
         }

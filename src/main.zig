@@ -53,12 +53,12 @@ pub fn main() !void {
                     var name : std.ArrayList(u8) = .empty;
                     defer name.deinit(allocator);
                     try name.appendSlice(allocator, projects[index].name);
-                    try app.open_input(allocator, &name, "name: ");
+                    app.open_input(allocator, &name, "name: ") catch { return; };
 
                     var path: std.ArrayList(u8) = .empty;
                     defer path.deinit(allocator);
                     try path.appendSlice(allocator, projects[index].path);
-                    try app.open_input(allocator, &path, "path: ");
+                    app.open_input(allocator, &path, "path: ") catch { return; };
 
                     const new_project: types.Project = .{
                         .name = name.items,
