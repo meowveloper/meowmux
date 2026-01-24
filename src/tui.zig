@@ -12,6 +12,7 @@ pub const Key = union(enum) {
     esc,
     ctrl_c,
     unknown,
+    backspace,
 };
 
 pub const Tui = struct {
@@ -62,6 +63,7 @@ pub const Tui = struct {
 
     pub fn deinit(self: *Tui) void {
         std.posix.tcsetattr(self.stdin.handle, .FLUSH, self.original_termios) catch {};
+        utils.print("\n", .{}) catch {};
     }
 
     pub fn read_key(self: *Tui) !Key {
@@ -83,6 +85,11 @@ pub const Tui = struct {
             }
         }
     }
+
+    pub fn render_input(_: *Tui, value: std.ArrayList(u8), prompt: []const u8) !void {
+        try utils.print("\r\x1b[K{s}{s}", .{ prompt, value.items });
+    }
+
     pub fn render_app_states (self: *Tui) !void {
         try self.clear_screen();
         try utils.print("{s}\n", .{constants.app_state_str});
@@ -106,6 +113,7 @@ pub fn parse_sequence (buf: []const u8) Key {
         '\r', '\n' => return .enter,
         3 => return .ctrl_c,
         32...126 => return .{ .char = buf[0] },
+        127 => return .backspace,
         else => return .unknown,
     }
 }

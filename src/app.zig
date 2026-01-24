@@ -1,6 +1,7 @@
 const std = @import("std");
 const tui = @import("tui.zig");
 const types = @import("types.zig");
+const utils = @import("utils.zig");
 
 pub fn open_app_state_selector_ui (allocator: std.mem.Allocator) !?types.App_State {
     var ui = try tui.Tui.init(allocator);
@@ -77,4 +78,23 @@ pub fn open_selector_ui(allocator: std.mem.Allocator, projects: []types.Project)
             else => {},
         }
     }
+}
+
+
+pub fn open_input(allocator: std.mem.Allocator, value: *std.ArrayList(u8), prompt: []const u8) !void {
+    var ui = try tui.Tui.init(allocator);
+    defer ui.deinit();
+
+    while (true) {
+        try ui.render_input(value.*, prompt);
+        const key = try ui.read_key();
+        switch (key) {
+            .char => |c| try value.append(allocator, c),
+            .backspace => _ = value.pop(),
+            .ctrl_c => break,
+            .enter => break,
+            else => {}
+        }
+    }
+    try utils.print("\n", .{});
 }

@@ -48,7 +48,25 @@ pub fn main() !void {
                 try config.add_project(allocator, projects, new_project, constants.config_file_path);
             },
             .edit => {
-                std.debug.print("edit an existing project\n", .{});
+                const selected_index = try app.open_selector_ui(allocator, projects);
+                if(selected_index) |index| {
+                    var name : std.ArrayList(u8) = .empty;
+                    defer name.deinit(allocator);
+                    try name.appendSlice(allocator, projects[index].name);
+                    try app.open_input(allocator, &name, "name: ");
+
+                    var path: std.ArrayList(u8) = .empty;
+                    defer path.deinit(allocator);
+                    try path.appendSlice(allocator, projects[index].path);
+                    try app.open_input(allocator, &path, "path: ");
+
+                    const new_project: types.Project = .{
+                        .name = name.items,
+                        .path = path.items
+                    };
+
+                    try config.edit_project(allocator, projects, new_project, index, constants.config_file_path);
+                }
             }
         }
     }
