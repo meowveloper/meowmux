@@ -35,15 +35,16 @@ pub fn main() !void {
             },
             .add => {
                 try utils.print("add a new project\n", .{});
-                try utils.print("name: ", .{});
-                var name_buffer: [1024]u8 = undefined;
-                const name = try utils.get_user_input(&name_buffer);
-                try utils.print("path:  ", .{});
-                var path_buffer: [1024]u8 = undefined;
-                const path = try utils.get_user_input(&path_buffer);
+                var name : std.ArrayList(u8) = .empty;
+                defer name.deinit(allocator);
+                app.open_input(allocator, &name, "name: ", false) catch { return; };
+
+                var path: std.ArrayList(u8) = .empty;
+                defer path.deinit(allocator);
+                app.open_input(allocator, &path, "path: ", true) catch { return; };
                 const new_project: types.Project = .{
-                    .name = name,
-                    .path = path
+                    .name = name.items,
+                    .path = path.items
                 };
                 try config.add_project(allocator, projects, new_project, constants.config_file_path);
             },
@@ -53,12 +54,12 @@ pub fn main() !void {
                     var name : std.ArrayList(u8) = .empty;
                     defer name.deinit(allocator);
                     try name.appendSlice(allocator, projects[index].name);
-                    app.open_input(allocator, &name, "name: ") catch { return; };
+                    app.open_input(allocator, &name, "name: ", false) catch { return; };
 
                     var path: std.ArrayList(u8) = .empty;
                     defer path.deinit(allocator);
                     try path.appendSlice(allocator, projects[index].path);
-                    app.open_input(allocator, &path, "path: ") catch { return; };
+                    app.open_input(allocator, &path, "path: ", true) catch { return; };
 
                     const new_project: types.Project = .{
                         .name = name.items,

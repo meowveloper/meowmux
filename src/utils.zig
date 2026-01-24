@@ -60,7 +60,7 @@ pub fn get_suggested_path(allocator: std.mem.Allocator, input: []const u8) ![]co
             }
             result = "";
         }
-    }
+    } else result = "";
     return result;
 }
 

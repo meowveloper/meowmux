@@ -81,7 +81,7 @@ pub fn open_selector_ui(allocator: std.mem.Allocator, projects: []types.Project)
 }
 
 
-pub fn open_input(allocator: std.mem.Allocator, value: *std.ArrayList(u8), prompt: []const u8) !void {
+pub fn open_input(allocator: std.mem.Allocator, value: *std.ArrayList(u8), prompt: []const u8, is_path: bool) !void {
     var ui = try tui.Tui.init(allocator);
     defer ui.deinit();
 
@@ -93,6 +93,14 @@ pub fn open_input(allocator: std.mem.Allocator, value: *std.ArrayList(u8), promp
             .backspace => _ = value.pop(),
             .ctrl_c => return error.quit,
             .enter => break,
+            .tab => {
+                if(is_path and value.items.len > 0) {
+                    const result = try utils.get_suggested_path(allocator, value.items);
+                    if(result.len > 0) {
+                        try value.appendSlice(allocator, result);
+                    } else continue;
+                } else continue;
+            },
             else => {}
         }
     }
