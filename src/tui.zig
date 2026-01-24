@@ -13,6 +13,7 @@ pub const Key = union(enum) {
     ctrl_c,
     unknown,
     backspace,
+    tab,
 };
 
 pub const Tui = struct {
@@ -112,6 +113,7 @@ pub fn parse_sequence (buf: []const u8) Key {
     switch (buf[0]) {
         '\r', '\n' => return .enter,
         3 => return .ctrl_c,
+        9 => return .tab,
         32...126 => return .{ .char = buf[0] },
         127 => return .backspace,
         else => return .unknown,
