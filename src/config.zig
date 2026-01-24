@@ -7,6 +7,10 @@ pub fn ensure_config_exists(allocator: std.mem.Allocator, config_path: []const u
     const expanded_path = try utils.ExpandedPath.get_path(allocator, config_path);
     defer expanded_path.deinit();
 
+    if (std.fs.path.dirname(expanded_path.path)) |dir_path| {
+        try std.fs.cwd().makePath(dir_path);
+    }
+
     const file = std.fs.cwd().createFile(expanded_path.path, .{ .exclusive = true }) catch |err| {
         if (err == error.PathAlreadyExists) return;
         return err;
@@ -73,3 +77,58 @@ pub fn edit_project(allocator: std.mem.Allocator, projects: []types.Project, new
 }
 
 
+test "get_projects" {
+    const allocator = std.testing.allocator;
+    const parsed_projects = try get_projects(allocator, constants.test_json_file_path);
+    defer parsed_projects.deinit();
+    const projects = parsed_projects.value;
+    for(projects) |project| {
+        std.debug.print("{s} ({s})\n", .{project.name, project.path});
+    }
+}
+
+test "save_projects" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const pro_slice: []types.Project = pro_arr.items;
+    try save_projects(allocator, pro_slice, constants.test_json_file_path);
+}
+
+test "delete_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    try delete_project(allocator, pro_arr.items, 0, constants.test_json_file_path);
+}
+
+test "edit_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const edited_project: types.Project = .{
+        .name = "edited",
+        .path = "/mmm/edited"
+    };
+    try edit_project(allocator, pro_arr.items, edited_project, 0, constants.test_json_file_path);
+}
+
+
+test "add_project" {
+    const allocator = std.testing.allocator;
+    var pro_arr : std.ArrayList(types.Project) = .empty;
+    defer pro_arr.deinit(allocator);
+    try pro_arr.append(allocator, .{ .name = "newly added 1", .path = "/newly-added-path-1"});
+    try pro_arr.append(allocator, .{ .name = "newly added 2", .path = "/newly-added-path-2"});
+    const new_project: types.Project = .{
+        .name = "added",
+        .path = "/mmm/added"
+    };
+    try add_project(allocator, pro_arr.items, new_project, constants.test_json_file_path);
+}

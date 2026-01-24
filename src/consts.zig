@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub const config_file_path = "~/.config/meowmux/projects.json";
-pub const test_json_file_path = "test.json";
+pub const test_json_file_path = "test/test.json";
 
 
 pub const app_title_str = "MEOWMUX - Select a Project (j/k or arrows, Enter to select, q to quit)\r\n\r\n";
