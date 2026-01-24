@@ -48,9 +48,16 @@ pub fn get_suggested_path(allocator: std.mem.Allocator, input: []const u8) ![]co
         defer dir.close();
         var iterator = dir.iterate();
         while (try iterator.next()) |entry| {
-            if (std.mem.eql(u8, entry.name, prefix)) continue;
+            if (std.mem.eql(u8, entry.name, prefix)) {
+                if (entry.kind == .directory and !std.mem.endsWith(u8, input, "/")) {
+                    result = "/";
+                    break;
+                } else continue;
+            }
             if (std.mem.startsWith(u8, entry.name, prefix)) {
-                result = entry.name;
+                if (entry.name.len > prefix.len) {
+                    result = entry.name[0 .. prefix.len + 1];
+                } else result = entry.name;
                 break;
             }
             result = "";
@@ -61,6 +68,6 @@ pub fn get_suggested_path(allocator: std.mem.Allocator, input: []const u8) ![]co
 
 test "get_suggested_path" {
     const allocator = std.testing.allocator;
-    const result = try get_suggested_path(allocator, "/home/meowveloper");
+    const result = try get_suggested_path(allocator, "/home/meowveloper/.config");
     std.debug.print("res: {s}\n\n", .{result});
 }
