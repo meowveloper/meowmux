@@ -2,4 +2,5 @@ zig-out
 .zig-cache
 test.json
 play.zig
+.direnv
 
