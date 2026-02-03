@@ -3,4 +3,5 @@ zig-out
 test.json
 play.zig
 .direnv
+releases
 
