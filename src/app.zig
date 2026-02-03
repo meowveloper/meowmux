@@ -29,14 +29,14 @@ pub fn open_app_state_selector_ui (allocator: std.mem.Allocator) !?types.App_Sta
     }
 }
 
-pub fn open_selector_ui(allocator: std.mem.Allocator, projects: []types.Project) !?usize {
+pub fn open_selector_ui(allocator: std.mem.Allocator, projects: []types.Project, info: []const u8) !?usize {
     var ui = try tui.Tui.init(allocator);
     defer ui.deinit();
 
     var selected_index: usize = 0;
 
     while (true) {
-        try ui.render_list(projects, selected_index);
+        try ui.render_list(projects, selected_index, info);
         const key = try ui.read_key();
 
         switch (key) {
