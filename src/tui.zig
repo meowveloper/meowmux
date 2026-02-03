@@ -74,9 +74,10 @@ pub const Tui = struct {
     }
 
 
-    pub fn render_list(self: *Tui, projects: []types.Project, selected_index: usize) !void {
+    pub fn render_list(self: *Tui, projects: []types.Project, selected_index: usize, info: []const u8) !void {
         try self.clear_screen();
-        try utils.print("{s}", .{constants.app_title_str});
+        try utils.print("\r\n{s}\r\n\r\n", .{constants.app_title_str});
+        try utils.print("{s}\r\n\r\n", .{info});
 
         for (projects, 0..) |project, i| {
             if (i == selected_index) {
@@ -93,7 +94,7 @@ pub const Tui = struct {
 
     pub fn render_app_states (self: *Tui) !void {
         try self.clear_screen();
-        try utils.print("{s}\n", .{constants.app_state_str});
+        try utils.print("\r\n{s}\r\n", .{constants.app_state_str});
     }
 };
 

@@ -4,7 +4,7 @@ pub const config_file_path = "~/.config/meowmux/projects.json";
 pub const test_json_file_path = "test/test.json";
 
 
-pub const app_title_str = "MEOWMUX - Select a Project (j/k or arrows, Enter to select, q to quit)\r\n\r\n";
+pub const app_title_str = "Select a Project (j/k or arrows, Enter to select, q to quit)";
 
 pub const indent = "    ";
 
@@ -12,10 +12,9 @@ pub const indent = "    ";
 pub const app_state_str = 
     indent ++ "MEOWMUX - tmux project manager" ++
     "\r\n\r\n" ++
-    indent ++ "choose action (type one: o, Enter, a, d, e)" ++
+    indent ++ "choose action (type one: o, Enter, a, d, e) (quit: type 'q' or 'ctrl c')" ++
     "\r\n\r\n" ++
-    indent ++ "open project(o, Enter),   add project(a),   delete project(d),   edit project(e)" ++
-    "\r\n\r\n"
+    indent ++ "open project(o, Enter),   add project(a),   delete project(d),   edit project(e)"
 ;
 
 
