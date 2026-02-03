@@ -10,7 +10,13 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
+    run(allocator) catch {
+        try utils.print("unexpected error occurred!\n", .{});
+    };
+}
 
+
+pub fn run(allocator: std.mem.Allocator) !void {
     const app_state = try app.open_app_state_selector_ui(allocator);
 
     const parsed_projects = try config.get_projects(allocator, constants.config_file_path);
