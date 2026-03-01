@@ -19,11 +19,6 @@
                     pkgs.pkg-config
                     pkgs.ffmpeg
                 ];
-
-                buildInputs = [
-                    pkgs.alsa-lib
-                ];
-
                 shellHook = ''
                     echo "Welcome to $(zig version) Dev Shell!"
                 '';
@@ -41,9 +36,6 @@
                     zig
                     pkgs.pkg-config
                     pkgs.autoPatchelfHook
-                ];
-                buildInputs = [
-                    pkgs.alsa-lib
                 ];
                 dontConfigure = true;
                 buildPhase = ''
