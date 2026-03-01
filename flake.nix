@@ -35,7 +35,7 @@
             zig = zig-overlay.packages.${system}."0.15.2";
         in {
             default = pkgs.stdenv.mkDerivation {
-                name = "meowkey";
+                name = "meowmux";
                 src = ./.; 
                 nativeBuildInputs = [
                     zig
