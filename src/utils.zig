@@ -24,15 +24,28 @@ pub const ExpandedPath = struct {
         self.allocator.free(self.path);
     }
 
-    pub fn get_path(allocator: std.mem.Allocator, path: []const u8) !ExpandedPath {
+    pub fn get_path(gpa: std.mem.Allocator, path: []const u8) !ExpandedPath {
         var result_path: []u8 = undefined;
         if (std.mem.startsWith(u8, path, "~/")) {
             const home = std.posix.getenv("HOME") orelse return error.HomeNotFound;
-            result_path = try std.fs.path.join(allocator, &[_][]const u8{ home, path[1..] });
+            result_path = try std.fs.path.join(gpa, &[_][]const u8{ home, path[1..] });
         } else {
-            result_path = try allocator.dupe(u8, path);
+            result_path = try gpa.dupe(u8, path);
         }
-        return ExpandedPath{ .path = result_path, .allocator = allocator };
+        try ensure_exists(result_path);
+        return ExpandedPath{ .path = result_path, .allocator = gpa };
+    }
+
+    fn ensure_exists(path: []const u8) !void {
+        if (std.fs.path.dirname(path)) |dir_path| {
+            try std.fs.cwd().makePath(dir_path);
+        }
+
+        const file = std.fs.cwd().createFile(path, .{ .exclusive = true }) catch |err| {
+            if (err == error.PathAlreadyExists) return;
+            return err;
+        };
+        defer file.close();
     }
 };
 
