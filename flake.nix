@@ -32,7 +32,7 @@
 
         packages = forEachSystem (system: let
             pkgs = nixpkgs.legacyPackages.${system};
-            zig = zig-overlay.packages.${system}.master;
+            zig = zig-overlay.packages.${system}."0.15.2";
         in {
             default = pkgs.stdenv.mkDerivation {
                 name = "meowkey";
