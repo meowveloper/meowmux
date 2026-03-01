@@ -4,21 +4,56 @@
         zig-overlay.url = "github:mitchellh/zig-overlay";
     };
 
-    outputs = { self, nixpkgs, zig-overlay }:
-        let
-            system = "x86_64-linux"; 
+    outputs = { self, nixpkgs, zig-overlay }: let
+        systems = [ "x86_64-linux" "aarch64-linux" ];
+        forEachSystem = nixpkgs.lib.genAttrs systems;
+    in {
+        devShells = forEachSystem (system: let
             pkgs = nixpkgs.legacyPackages.${system};
             zig = zig-overlay.packages.${system}."0.15.2";
         in {
-            devShells.${system}.default = pkgs.mkShell {
+            default = pkgs.mkShell {
                 nativeBuildInputs = [
                     zig
                     pkgs.zls
+                    pkgs.pkg-config
+                    pkgs.ffmpeg
+                ];
+
+                buildInputs = [
+                    pkgs.alsa-lib
                 ];
 
                 shellHook = ''
-                    echo "Welcome to the Zig 0.15.2 Dev Shell!"
+                    echo "Welcome to $(zig version) Dev Shell!"
                 '';
             };
-        };
+        });
+
+        packages = forEachSystem (system: let
+            pkgs = nixpkgs.legacyPackages.${system};
+            zig = zig-overlay.packages.${system}.master;
+        in {
+            default = pkgs.stdenv.mkDerivation {
+                name = "meowkey";
+                src = ./.; 
+                nativeBuildInputs = [
+                    zig
+                    pkgs.pkg-config
+                    pkgs.autoPatchelfHook
+                ];
+                buildInputs = [
+                    pkgs.alsa-lib
+                ];
+                dontConfigure = true;
+                buildPhase = ''
+                    export ZIG_GLOBAL_CACHE_DIR=$TMPDIR/zig-cache
+                    export ZIG_LOCAL_CACHE_DIR=$TMPDIR/zig-local-cache
+                    mkdir -p $ZIG_GLOBAL_CACHE_DIR $ZIG_LOCAL_CACHE_DIR
+                    zig build -Doptimize=ReleaseSafe --prefix $out --global-cache-dir $ZIG_GLOBAL_CACHE_DIR
+                '';
+                dontInstall = true;
+            };
+        });
+    };
 }
