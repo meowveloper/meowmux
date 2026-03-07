@@ -4,4 +4,5 @@ test.json
 play.zig
 .direnv
 result
+docs
 
